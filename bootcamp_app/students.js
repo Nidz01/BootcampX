@@ -52,16 +52,17 @@ LIMIT 5;
 // Query 4 (allow a user to specify a cohort name and the limit.)
 const [ , , cohort, limit]= process.argv
 
+const values = [`%${cohort}%`, `${limit}`];
+
 pool.query(`
 SELECT students.id, students.name, cohorts.name as cohort_name
 FROM students
 JOIN cohorts
 ON students.cohort_id = cohorts.id
-WHERE cohorts.name Like '%${cohort}%'
-LIMIT ${limit};
-`) 
+WHERE cohorts.name Like $1
+LIMIT $2;
+`, values) 
 .then(res => {
-  console.log(res.rows)
   res.rows.forEach(user => {
 
     console.log(`${user.name} has an id of ${user.id} and was in the ${user.cohort_name} cohort`);
